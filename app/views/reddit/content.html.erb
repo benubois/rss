@@ -1,0 +1,23 @@
+<% if post.media_type == "image" %>
+    <a href="<%= post.media_url %>"><img src="<%= post.media_url %>"></a>
+<% elsif post.reddit_video %>
+    <video poster="<%= raw post.poster %>">
+      <source src="<%= raw CGI.unescapeHTML(post.reddit_video.dig("hls_url")) %>" type="application/x-mpegURL">
+      <source src="<%= raw CGI.unescapeHTML(post.reddit_video.dig("dash_url")) %>" type="application/dash+xml">
+      <source src="<%= raw CGI.unescapeHTML(post.reddit_video.dig("fallback_url")) %>" type="video/mp4">
+    </video>
+<% elsif post.media_type == "imgur" %>
+    <video poster="<%= post.imgur_url %>.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline="">
+        <source src="<%= post.imgur_url %>.mp4" type="video/mp4">
+    </video>
+<% elsif post.media_type == "gfycat" %>
+    <video poster="<%= post.gfycat_poster %>" preload="auto" autoplay="autoplay" muted="muted" loop="loop" playsinline="">
+        <source src="<%= post.gfycat_url %>" type="video/mp4">
+    </video>
+<% elsif post.media_type == "oembed" %>
+    <%= post.oembed %>
+<% elsif post.media_type == "gallery" %>
+    <% post.gallery_urls.each do |url| %>
+      <a href="<%= url %>"><img src="<%= url %>"></a>
+    <% end %>
+<% end %>

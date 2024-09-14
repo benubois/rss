@@ -1,6 +1,7 @@
 require "net/http"
 
 class MastodonController < ApplicationController
+  BASE_URL = "https://mastodon.social"
 
   def search
     search_results = perform_search(params[:query])
@@ -14,7 +15,7 @@ class MastodonController < ApplicationController
     uri.query = URI.encode_www_form({ q: query, limit: 20 })
     logger.info { uri }
     request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "Bearer #{ACCESS_TOKEN}"
+    request["Authorization"] = "Bearer #{Rails.application.credentials.mastodon_access_token!}"
 
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
       http.request(request)
@@ -36,7 +37,7 @@ class MastodonController < ApplicationController
   def feed(search_results, query)
     {
       version: "https://jsonfeed.org/version/1.1",
-      title: "Mastodon Search Results for #{query}",
+      title: "Mastodon #{query}",
       home_page_url: BASE_URL,
       feed_url: "#{BASE_URL}/api/v2/search?q=#{URI.encode_www_form_component(query)}",
       items: items(search_results)

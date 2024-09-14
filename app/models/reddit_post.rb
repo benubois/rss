@@ -52,7 +52,7 @@ class RedditPost
   end
 
   def media_url
-    @data.dig("data", "url")
+    CGI.unescapeHTML(@data.dig("data", "url"))
   end
 
   def reddit_video
@@ -61,7 +61,7 @@ class RedditPost
 
   def poster
     if reddit_video
-      @data.dig("data", "preview", "images", 0, "source", "url")
+      CGI.unescapeHTML(@data.dig("data", "preview", "images", 0, "source", "url"))
     end
   end
 
@@ -87,13 +87,13 @@ class RedditPost
   end
 
   def gfycat_poster
-    gfycat_data.dig("gfyItem", "posterUrl")
+    CGI.unescapeHTML(gfycat_data.dig("gfyItem", "posterUrl"))
   rescue
     nil
   end
 
   def gfycat_url
-    gfycat_data.dig("gfyItem", "mp4Url")
+    CGI.unescapeHTML(gfycat_data.dig("gfyItem", "mp4Url"))
   rescue
     nil
   end
@@ -117,7 +117,7 @@ class RedditPost
   def gallery_urls
     ids = @data.dig("data", "gallery_data", "items").map { _1["media_id"] }
     items = @data.dig("data", "media_metadata").slice(*ids)
-    items.values.map { _1.dig("s", "u") }
+    items.values.map { CGI.unescapeHTML(_1.dig("s", "u")) }
   end
 
 end

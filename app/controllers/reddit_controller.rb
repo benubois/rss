@@ -11,7 +11,7 @@ class RedditController < ApplicationController
 
   def perform_search(query)
     # Load and parse the JSON file
-    file = File.read(Rails.root.join('app', 'controllers', 'aww.json'))
+    file = File.read(Rails.root.join('test', 'support', 'subreddit.json'))
     JSON.parse(file)
   end
 
@@ -28,7 +28,7 @@ class RedditController < ApplicationController
   def feed(search_results, query)
     {
       version: "https://jsonfeed.org/version/1.1",
-      title: "Reddit Search Results for #{query}",
+      title: "Reddit r/#{params[:subreddit]}",
       home_page_url: "https://www.reddit.com",
       feed_url: "https://www.reddit.com/search?q=#{URI.encode_www_form_component(query)}",
       items: items(search_results)
@@ -40,12 +40,12 @@ class RedditController < ApplicationController
       id: post.id,
       url: post.url,
       title: post.title,
-      content_html: ApplicationController.render(Reddit::PostView.new(post: post), layout: nil),
+      content_html: ApplicationController.render("reddit/content", locals: {post: post}, layout: nil),
       date_published: post.published,
       authors: [
         {
           name: post.author,
-          url: "https://old.reddit.com/user/#{post.author}"
+          url: "https://old.reddit.com/user/#{post.author}",
         }
       ]
     }
