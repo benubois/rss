@@ -1,10 +1,9 @@
-require 'etc'
-
 workers 0
+
 threads_count = ENV.fetch("MAX_THREADS", 4)
 threads threads_count, threads_count
 
-if Rails.env.production?
+if ENV.fetch("RAILS_ENV") == "production"
   pidfile File.join(ENV["SHARED_DIRECTORY"], "tmp", "puma.pid")
   bind File.join("unix://", ENV["SHARED_DIRECTORY"], "tmp", "puma.sock")
 else
