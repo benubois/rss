@@ -13,15 +13,10 @@ class MastodonController < ApplicationController
   def perform_search(query)
     uri = URI("#{BASE_URL}/api/v2/search")
     uri.query = URI.encode_www_form({ q: query, limit: 20 })
-    logger.info { uri }
-    request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "Bearer #{Rails.application.credentials.mastodon_access_token!}"
-
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
-      http.request(request)
-    end
-
-    JSON.parse(response.body)
+    response = HttpRequest.new(uri.to_s, headers: {
+      authorization: "Bearer #{Rails.application.credentials.mastodon_access_token!}"
+    }).get
+    response.parse
   end
 
   def items(search_results)
