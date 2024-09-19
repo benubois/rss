@@ -1,3 +1,5 @@
+require "net/http"
+
 class HttpRequest
   def initialize(url, proxy: false, headers: {})
     @url = url
@@ -6,23 +8,27 @@ class HttpRequest
   end
 
   def get
-    http = HTTP
-      .headers(headers)
-      .follow(max_hops: 4)
-      .timeout(connect: 5, write: 5, read: 30)
-      .use(:auto_inflate)
-    if @proxy
-      url = URI.parse(Rails.application.credentials.proxy_url!)
-      http.via(url.host, url.port, url.user, url.password)
+    request = Net::HTTP::Get.new(@url.path)
+
+    headers.each do |name, value|
+      request[name] = value
     end
-    http.get(@url)
+
+    base = if @proxy
+      proxy = URI.parse(Rails.application.credentials.proxy_url!)
+      Net::HTTP::Proxy(proxy.host, proxy.port, proxy.user, proxy.password)
+    else
+      Net::HTTP
+    end
+
+    base.start(@url.hostname, @url.port, use_ssl: @url.scheme == "https") do |http|
+      http.request(request)
+    end
   end
 
   def headers
     Hash.new.tap do |hash|
-      hash[:user_agent]        = Rails.application.credentials.user_agent if Rails.application.credentials.user_agent
-      hash[:accept_encoding]   = "gzip, deflate" if @auto_inflate
+      hash["User-Agent"] = Rails.application.credentials.user_agent if Rails.application.credentials.user_agent
     end.merge(@headers)
   end
-
 end

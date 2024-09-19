@@ -3,6 +3,7 @@ require "net/http"
 class RedditController < ApplicationController
 
   BASE_URL = "https://old.reddit.com"
+
   def subreddit
     search_results = perform_search(params[:query])
     render json: feed(search_results, params[:query])
@@ -11,10 +12,9 @@ class RedditController < ApplicationController
   private
 
   def perform_search(query)
-    uri = URI("#{BASE_URL}/r/#{params[:subreddit]}.json")
-    uri.query = URI.encode_www_form({ q: query, limit: 20 })
-    response = HttpRequest.new(uri.to_s, proxy: true).get
-    response.parse
+    uri = URI("#{BASE_URL}/r/aww.json")
+    response = HttpRequest.new(uri, proxy: true).get
+    JSON.parse(response.body)
   end
 
   def items(search_results)

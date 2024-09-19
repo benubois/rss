@@ -16,7 +16,7 @@ class MastodonController < ApplicationController
     response = HttpRequest.new(uri.to_s, headers: {
       authorization: "Bearer #{Rails.application.credentials.mastodon_access_token!}"
     }).get
-    response.parse
+    JSON.parse(response.body)
   end
 
   def items(search_results)
