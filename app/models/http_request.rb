@@ -8,7 +8,7 @@ class HttpRequest
   end
 
   def get
-    request = Net::HTTP::Get.new(@url.path)
+    request = Net::HTTP::Get.new(@url)
 
     headers.each do |name, value|
       request[name] = value
