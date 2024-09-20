@@ -60,7 +60,8 @@ class RedditPost
   end
 
   def poster
-    if reddit_video
+    url = @data.dig("data", "preview", "images", 0, "source", "url")
+    if reddit_video && url
       CGI.unescapeHTML(@data.dig("data", "preview", "images", 0, "source", "url"))
     end
   end
