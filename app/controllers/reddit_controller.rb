@@ -5,14 +5,14 @@ class RedditController < ApplicationController
   BASE_URL = "https://old.reddit.com"
 
   def subreddit
-    search_results = perform_search(params[:query])
-    render json: feed(search_results, params[:query])
+    search_results = perform_search
+    render json: feed(search_results)
   end
 
   private
 
-  def perform_search(query)
-    uri = URI("#{BASE_URL}/r/aww.json")
+  def perform_search
+    uri = URI("#{BASE_URL}/r/#{params[:subreddit]}.json")
     response = HttpRequest.new(uri, proxy: true).get
     JSON.parse(response.body)
   end
@@ -27,12 +27,12 @@ class RedditController < ApplicationController
     items
   end
 
-  def feed(search_results, query)
+  def feed(search_results)
     {
       version: "https://jsonfeed.org/version/1.1",
       title: "Reddit r/#{params[:subreddit]}",
       home_page_url: "https://www.reddit.com",
-      feed_url: "https://www.reddit.com/search?q=#{URI.encode_www_form_component(query)}",
+      feed_url: "https://www.reddit.com/search?q=#{URI.encode_www_form_component(params[:subreddit])}",
       items: items(search_results)
     }
   end
