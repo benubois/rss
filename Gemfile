@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 7.2.1"
+gem "rails", "~> 8"
 
 gem "bootsnap", require: false
 gem "http"
