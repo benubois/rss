@@ -30,7 +30,7 @@ class RedditController < ApplicationController
   def feed(search_results)
     {
       version: "https://jsonfeed.org/version/1.1",
-      title: "Reddit r/#{params[:subreddit]}",
+      title: params[:subreddit],
       home_page_url: "https://www.reddit.com",
       feed_url: "https://www.reddit.com/search?q=#{URI.encode_www_form_component(params[:subreddit])}",
       items: items(search_results)
