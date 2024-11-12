@@ -15,7 +15,7 @@
         <source src="<%= post.gfycat_url %>" type="video/mp4">
     </video>
 <% elsif post.media_type == "oembed" %>
-    <%= post.oembed %>
+    <%= post.oembed.html_safe %>
 <% elsif post.media_type == "gallery" %>
     <% post.gallery_urls.each do |url| %>
       <a href="<%= url %>"><img src="<%= url %>"></a>

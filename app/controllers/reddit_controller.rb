@@ -32,7 +32,7 @@ class RedditController < ApplicationController
       version: "https://jsonfeed.org/version/1.1",
       title: params[:subreddit],
       home_page_url: "https://www.reddit.com",
-      feed_url: "https://www.reddit.com/search?q=#{URI.encode_www_form_component(params[:subreddit])}",
+      feed_url: "https://www.reddit.com/r/#{params[:subreddit]}",
       items: items(search_results)
     }
   end
