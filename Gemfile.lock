@@ -174,7 +174,10 @@ GEM
     parser (3.3.6.0)
       ast (~> 2.4.1)
       racc
-    phlex-rails (0.1.0)
+    phlex (1.11.0)
+    phlex-rails (1.2.2)
+      phlex (>= 1.10, < 2)
+      railties (>= 6.1, < 9)
     psych (5.2.0)
       stringio
     public_suffix (6.0.1)
