@@ -30,8 +30,39 @@ class BlueskyController < ApplicationController
 
     posts = JSON.parse(response.body)
 
-    render json: to_feed(username, posts)
+    render json: to_feed(username, posts["feed"])
   end
+
+  def search
+    query = params[:query]
+
+    access_token = authenticate
+
+    bsky_url = URI("#{BLUESKY_BASE_URL}/xrpc/app.bsky.feed.searchPosts")
+    bsky_url.query = URI.encode_www_form({ q: query })
+
+    http = Net::HTTP.new(bsky_url.host, bsky_url.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Get.new(bsky_url)
+    request["Accept"] = "application/json"
+
+    if access_token
+      request["Authorization"] = "Bearer #{access_token}"
+    end
+
+    response = http.request(request)
+
+    # Handle unauthorized response
+    if response.code == "401"
+      return render json: { error: "Unauthorized" }, status: :unauthorized
+    end
+
+    posts = JSON.parse(response.body)
+
+    render json: to_feed(query, posts["posts"])
+  end
+
 
   def to_feed(username, posts)
     feed = {
@@ -42,19 +73,19 @@ class BlueskyController < ApplicationController
       items: []
     }
 
-    posts["feed"].each do |post|
+    posts.each do |post|
       feed[:items] << {
-        id: post["post"]["uri"],
-        url: "https://bsky.app/profile/#{username}/post/#{post["post"]["uri"].split("/").last}",
+        id: post["uri"],
+        url: "https://bsky.app/profile/#{post["author"]["handle"]}/post/#{post["uri"].split("/").last}",
         content_html: ApplicationController.render("bluesky/content", locals: {post: post}, layout: nil),
-        date_published: post["post"]["record"]["createdAt"],
+        date_published: post["record"]["createdAt"],
         authors: [
           {
-            name: post["post"]["author"]["displayName"],
-            url: "https://bsky.app/profile/#{post["post"]["author"]["handle"]}",
-            avatar: post["post"]["author"]["avatar"],
+            name: post["author"]["displayName"],
+            url: "https://bsky.app/profile/#{post["author"]["handle"]}",
+            avatar: post["author"]["avatar"],
             _social: {
-              username: post["post"]["author"]["handle"]
+              username: post["author"]["handle"]
             }
           }
         ]
