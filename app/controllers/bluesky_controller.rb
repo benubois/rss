@@ -54,6 +54,9 @@ class BlueskyController < ApplicationController
     }
 
     posts.each do |post|
+      if post.key?("post")
+        post = post["post"]
+      end
       feed[:items] << {
         id: post["uri"],
         url: "https://bsky.app/profile/#{post["author"]["handle"]}/post/#{post["uri"].split("/").last}",
