@@ -1,0 +1,11 @@
+<% post["post"]["record"]["text"].split("\n\n").each do |line| %>
+  <p><%= line %></p>
+<% end %>
+
+<% if embed = post["post"]["embed"] %>
+  <% if images = embed["images"] %>
+    <% images.each do |image| %>
+      <img src="<%= image["fullsize"] %>" width="<%= image["aspectRatio"]["width"] %>" height="<%= image["aspectRatio"]["height"] %>" alt="<%= image["alt"] %>">
+    <% end %>
+  <% end %>
+<% end %>
