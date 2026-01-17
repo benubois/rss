@@ -1,0 +1,45 @@
+name: "rss"
+
+x-shared-config: &shared-config
+  restart: unless-stopped
+  pull_policy: always
+  sysctls: ["net.ipv6.conf.all.disable_ipv6=1"]
+
+x-proxy-config: &proxy-config
+  depends_on: ["tailscale"]
+  network_mode: service:tailscale
+
+services:
+  tailscale:
+    <<: [*shared-config]
+    container_name: rss-tailscale
+    image: tailscale/tailscale:stable
+    volumes:
+      - tailscale.state:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_EXTRA_ARGS=${TAILSCALE_EXTRA_ARGS:-}
+
+  app:
+    <<: [*shared-config]
+    container_name: rss
+    build:
+      context: .
+    volumes:
+      - rss.database:/rails/storage
+    environment:
+      - RACK_ENV=production
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+    ports:
+      - 3000:3000
+
+volumes:
+  tailscale.state:
+  rss.database:

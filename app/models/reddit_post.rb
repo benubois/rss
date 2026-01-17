@@ -118,7 +118,7 @@ class RedditPost
   def gallery_urls
     ids = @data.dig("data", "gallery_data", "items").map { _1["media_id"] }
     items = @data.dig("data", "media_metadata").slice(*ids)
-    items.values.map { CGI.unescapeHTML(_1.dig("s", "u")) }
+    items.values.filter_map { it.dig("s", "u") }.map { CGI.unescapeHTML(it) }
   end
 
 end
