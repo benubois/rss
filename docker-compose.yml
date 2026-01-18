@@ -30,8 +30,7 @@ services:
   app:
     <<: [*shared-config]
     container_name: rss
-    build:
-      context: .
+    image: ghcr.io/benubois/rss:latest
     volumes:
       - rss.database:/rails/storage
     environment:
