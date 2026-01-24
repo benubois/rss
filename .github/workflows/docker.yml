@@ -67,7 +67,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
             type=semver,pattern={{major}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
           flavor: |
-            latest=false
+            latest=auto
             suffix=-${{ matrix.arch }}
           labels: |
             org.opencontainers.image.source=${{ env.SOURCE_URL }}
