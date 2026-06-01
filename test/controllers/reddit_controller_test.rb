@@ -57,10 +57,12 @@ class RedditControllerTest < ActionDispatch::IntegrationTest
     assert_equal "https://old.reddit.com/user/alice", item["authors"].first["url"]
   end
 
-  test "requests the subreddit from the listing endpoint" do
+  test "requests the subreddit from the listing endpoint through the proxy" do
     requested = nil
-    HttpRequest.define_singleton_method(:new) do |url, **_opts|
+    options = nil
+    HttpRequest.define_singleton_method(:new) do |url, **opts|
       requested = url.to_s
+      options = opts
       FakeHttpRequest.new(url, "test.json" => FakeResponse.json(LISTING))
     end
 
@@ -71,5 +73,30 @@ class RedditControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_equal "https://old.reddit.com/r/test.json", requested
+    # Reddit blocks the server's IP, so the listing must be fetched via the proxy.
+    assert_equal true, options[:proxy]
+  end
+
+  # End-to-end against a real old.reddit.com/r/aww.json capture. This is the
+  # only test that exercises the content view's video and gallery branches with
+  # genuine Reddit payloads (entity-escaped urls, crosspost metadata, etc.).
+  test "renders real video and gallery posts from a captured listing" do
+    listing = JSON.parse(File.read(Rails.root.join("test/support/subreddit.json")))
+
+    stub_http("old.reddit.com/r/aww.json" => FakeResponse.json(listing)) do
+      get "/reddit/aww"
+    end
+
+    assert_response :success
+    items = response.parsed_body["items"]
+    assert_equal 26, items.size
+
+    video = items.find { |item| item["id"] == "1fft2lf" }
+    assert_includes video["content_html"], "<video"
+    assert_includes video["content_html"], "v.redd.it"
+    refute_includes video["content_html"], "&amp;amp;", "video urls should be unescaped, not double-escaped"
+
+    gallery = items.find { |item| item["id"] == "1fg1i35" }
+    assert_equal 3, gallery["content_html"].scan("<img").size
   end
 end
