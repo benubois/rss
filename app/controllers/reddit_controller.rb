@@ -1,7 +1,6 @@
 require "net/http"
 
 class RedditController < ApplicationController
-
   BASE_URL = "https://old.reddit.com"
 
   def subreddit
@@ -42,12 +41,12 @@ class RedditController < ApplicationController
       id: post.id,
       url: post.url,
       title: post.title,
-      content_html: ApplicationController.render("reddit/content", locals: {post: post}, layout: nil),
+      content_html: ApplicationController.render("reddit/content", locals: { post: post }, layout: nil),
       date_published: post.published,
       authors: [
         {
           name: post.author,
-          url: "https://old.reddit.com/user/#{post.author}",
+          url: "https://old.reddit.com/user/#{post.author}"
         }
       ]
     }

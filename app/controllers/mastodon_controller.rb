@@ -12,7 +12,7 @@ class MastodonController < ApplicationController
 
   def perform_search(query)
     uri = URI("#{BASE_URL}/api/v2/search")
-    uri.query = URI.encode_www_form({q: query, limit: 20})
+    uri.query = URI.encode_www_form({ q: query, limit: 20 })
     response = HttpRequest.new(uri, headers: {
       authorization: "Bearer #{Rails.application.credentials.mastodon_access_token!}"
     }).get

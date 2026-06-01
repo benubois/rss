@@ -1,6 +1,6 @@
 class RedditPost
   def to_partial_path
-    'reddit_post'
+    "reddit_post"
   end
 
   GFYCAT_URL = /https?:\/\/(?:(?:www|giant|thumbs)\.)?gfycat\.com\/(?:ru\/|ifr\/|gifs\/detail\/)?(?<video_id>[^-\/?#\.]+)/
@@ -17,7 +17,7 @@ class RedditPost
   def published
     date = @data.dig("data", "created_utc") || Time.now.to_i
     date = Time.at(date)
-    date.utc.strftime '%Y-%m-%dT%H:%M:%S%z'
+    date.utc.strftime "%Y-%m-%dT%H:%M:%S%z"
   end
 
   def id
@@ -120,5 +120,4 @@ class RedditPost
     items = @data.dig("data", "media_metadata").slice(*ids)
     items.values.filter_map { it.dig("s", "u") }.map { CGI.unescapeHTML(it) }
   end
-
 end
