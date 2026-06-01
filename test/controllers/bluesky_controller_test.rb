@@ -40,8 +40,17 @@ class BlueskyControllerTest < ActionDispatch::IntegrationTest
     item = feed["items"].first
     assert_equal "at://did:plc:abc/app.bsky.feed.post/xyz123", item["id"]
     assert_equal "https://bsky.app/profile/alice.bsky.social/post/xyz123", item["url"]
-    assert_includes item["content_html"], "Hello world"
-    assert_includes item["content_html"], "https://example.com/image.jpg"
+
+    # The content view splits the post text on blank lines into <p> tags and
+    # renders each embedded image with its alt text and aspect ratio.
+    html = item["content_html"]
+    assert_includes html, "<p>Hello world</p>"
+    assert_includes html, "<p>Second paragraph</p>"
+    assert_includes html, %(src="https://example.com/image.jpg")
+    assert_includes html, %(alt="a cat")
+    assert_includes html, %(width="100")
+    assert_includes html, %(height="200")
+
     assert_equal "Alice", item["authors"].first["name"]
     assert_equal "alice.bsky.social", item["authors"].first.dig("_social", "username")
   end
