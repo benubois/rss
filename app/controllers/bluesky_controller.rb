@@ -60,7 +60,7 @@ class BlueskyController < ApplicationController
       feed[:items] << {
         id: post["uri"],
         url: "https://bsky.app/profile/#{post["author"]["handle"]}/post/#{post["uri"].split("/").last}",
-        content_html: ApplicationController.render("bluesky/content", locals: {post: post}, layout: nil),
+        content_html: ApplicationController.render("bluesky/content", locals: { post: post }, layout: nil),
         date_published: post["record"]["createdAt"],
         authors: [
           {
